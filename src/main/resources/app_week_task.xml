@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<properties>
+		<tasks.parallel.permits>1</tasks.parallel.permits>
+		<tasks>
+			<task>
+				<name></name>
+				<args><![CDATA[{"logTypes":"A","granularity":"WEEK","configFile":"parameters_activity_indicators.xml",
+				"mapReduceClassName":"ActivityUsersIndicatorMapReduce"}]]></args>
+			</task>
+		</tasks>
+	</properties>
+</configuration>

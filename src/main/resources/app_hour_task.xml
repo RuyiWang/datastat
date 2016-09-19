@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<properties>
+		<tasks.parallel.permits>1</tasks.parallel.permits>
+		<tasks>
+			<task>
+				<name>用户基础分析天累计</name>
+				<args><![CDATA[{"logTypes":"A","granularity":"AHOUR","configFile":"parameters_activity_indicators_allDay_hour.xml",
+				"mapReduceClassName":"ActiveUsersIndicatorAllDayMapReduce"}]]></args>
+			</task>
+			<!-- 
+			<task>
+				<name>用户基础分析</name>
+				<args><![CDATA[{"logTypes":"A","granularity":"HOUR","configFile":"parameters_activity_indicators.xml",
+				"mapReduceClassName":"ActivityUsersIndicatorMapReduce"}]]></args>
+			</task>
+			<task>
+				<name>启动用户分析</name>
+				<args><![CDATA[{"logTypes":"A","granularity":"AHOUR","configFile":"parameters_activity_userstart.xml",
+				"mapReduceClassName":"ActivityUsersStartMapReduce"}]]></args>
+			</task>
+			 -->
+		</tasks>
+	</properties>
+</configuration>

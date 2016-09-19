@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<properties>
+		<property>
+			<name>mapred.job.name</name>
+			<value><![CDATA[Activity用户留存]]></value>
+		</property> 
+		
+		<!-- 支持的指标
+		<indicators>
+			<indicator> <name>NUMBER_USERS</name> <value>true</value> </indicator>
+			<indicator> <name>NUMBER_NEW_USERS</name> <value>true</value> </indicator>
+			<indicator> <name>NUMBER_ACITVE_USERS</name> <value>true</value> </indicator>
+			<indicator> <name>TIMES_START</name> <value>true</value> </indicator>
+			<indicator> <name>TIME_AVERAGE</name> <value>true</value> </indicator>
+		</indicators>
+		 -->
+		<!-- 数据库配置 -->
+		<property>
+			<name>mapreduce.jdbc.driver.class</name>
+			<value>oracle.jdbc.OracleDriver</value>
+			<description>数据库驱动类</description>
+		</property>
+		<property>
+			<name>mapreduce.jdbc.url</name>
+			<value>jdbc:oracle:thin:@10.14.16.46:1521:db46</value>
+			<description>数据库链接</description>
+		</property>
+		<property>
+			<name>mapreduce.jdbc.username</name>
+			<value>appclient</value>
+			<description>帐号</description>
+		</property>
+		<property>
+			<name>mapreduce.jdbc.password</name>
+			<value>appclient</value>
+			<description>密码</description>
+		</property>
+		<property>
+			<name>mapreduce.jdbc.insert.batchsize</name>
+			<value>1000</value>
+			<description>基础数据入库的mr批处理记录数(0等于不做设置)</description>
+		</property>
+		<!-- MR调优参数 -->
+		<property>
+			<name>mapred.child.java.opts</name>
+			<value>-Xmx2048M -XX:+UseParNewGC</value>
+		</property>
+		<property>
+			<name>keep.failed.task.files</name>
+			<value>false</value>
+			<description>
+			<![CDATA[
+			使用远程调试器,任务失败是,tasktracker能保留足够的信息让任务在相同的输入数据上重新运行.
+			并使用WebUI查看故障节点和task attempt ID(该 ID以字符串attempt_开始).]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.job.priority</name>
+			<value>HIGH</value>
+			<description><![CDATA[作业优先级,VERY_HIGH,HIGH,NORMAL,LOW,VERY_LOW]]></description>
+		</property>
+		<property>
+			<name>mapred.reduce.tasks</name>
+			<value>26</value>
+			<description>
+			<![CDATA[
+			关于多少Map和Reduce的建议
+			Map的数目通常是由输入数据的大小决定的，一般就是所有输入文件的总块（block）数。
+			Reduce的数目建议是0.95或1.75乘以 (<no. of nodes> * mapred.tasktracker.reduce.tasks.maximum)。
+			用0.95，所有reduce可以在maps一完成时就立刻启动，开始传输map的输出结果。用1.75，速度快的节点可以
+			在完成第一轮reduce任务后，可以开始第二轮，这样可以得到比较好的负载均衡的效果。]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.task.timeout</name>
+			<value>0</value>
+			<description>
+			<![CDATA[mr任务用不超时]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.map.tasks.speculative.execution</name>
+			<value>true</value>
+			<description>
+			<![CDATA[根据map的健康情况考虑是否杀死它]]>
+			</description>
+		</property>
+		<property>
+			<name>io.file.buffer.size</name>
+			<value>131072</value>
+			<description>
+			<![CDATA[
+			应该在集群中增加这个值.现代硬件和操作系统来说4kb太保守了.增大缓冲区容量会显著提高性能.
+			例如64kb,128kb更为常见65536]]>
+			</description>
+		</property>
+		<property>
+			<name>io.sort.factor</name>
+			<value>20</value>
+			<description>
+			<![CDATA[
+			排序文件是,一次最多合并的流数.reduce中使用.增加到100很常见.
+			每当内存中的数据达到spill 阀值的时候，都会产生一个新的spill 文件，
+			所以在Map任务写完它的最后一个输出记录时，可能会有多个spill 文件。
+			在Map 任务完成前，所有的spill 文件将会被归并排序为一个索引文件和数据文件，
+			这是一个多路归并过程，最大归并路数由io.sort.factor 控制(默认是10)。
+			如果设定了Combiner，并且spill文件的数量至少是3（由min.num.spills.for.combine 属性控制），
+			那么Combiner 将在输出文件被写入磁盘前运行以压缩数据。]]>
+			</description>
+		</property>
+		<property>
+			<name>io.sort.mb</name>
+			<value>400</value>
+			<description> <![CDATA[ 
+			每个Map 任务都有一个用来写入输出数据的循环内存缓冲区。
+			这个缓冲区默认大小是100MB，可以通过io.sort.mb 属性来设置具体大小。
+			当缓冲区中的数据量达到一个特定阀值(io.sort.mb * io.sort.spill.percent，其中io.sort.spill.percent 默认是0.80)时， 
+			系统将会启动一个后台线程把缓冲区中的内容spill 到磁盘。
+			在spill 过程中，Map 的输出将会继续写入到缓冲区，但如果缓冲区已满， Map 就会被阻塞直到spill 完成。
+			spill 线程在把缓冲区的数据写到磁盘前，会对它进行一个二次快速排序，首先根据数据所属的partition 
+			排序， 然后每个partition 中再按Key 排序。输出包括一个索引文件和数据文件。
+			如果设定了Combiner，将在排序输出的基础上运行。
+			Combiner 就是一个Mini Reducer，它在执行Map 任务的节点本身运行，
+			先对Map 的输出做一次简单Reduce，使得Map 的输出更紧凑， 更少的数据会被写入磁盘和传送到Reducer。
+			spill 文件保存在由mapred.local.dir指定的目录中，Map 任务结束后删除。 ]]>
+			</description>
+		</property>
+		<property>
+			<name>io.sort.spill.percent</name>
+			<value>0.90</value>
+		</property>
+		<property>
+			<name>mapred.compress.map.output</name>
+			<value>true</value>
+			<description>
+			<![CDATA[
+			对写入到磁盘的数据进行压缩（这种压缩同Combiner 的压缩不一样）通常是一个很好的方法，因为这样做使得数据写入磁盘的速度更快，
+			节省磁盘空间，并减少需要传送到Reducer 的数据量
+			]]>
+			</description>
+		</property>
+		<property>
+			<name>fs.inmemory.size.mb</name>
+			<value>100</value>
+			<description> 
+			<![CDATA[ 为reduce阶段合并map输出所需的内存文件系统分配更多的内存 默认100 ]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.reduce.parallel.copies</name>
+			<value>50</value>
+			<description> 
+			<![CDATA[ 
+			Reduce到每个完成的Map Task copy数据（通过RPC调用），默认同时启动5个线程到map节点取数据。
+			这个配置还是很关键的，如果你的map输出数据很大，有时候会发现map早就100%了，reduce一直在1% 2%。
+			缓慢的变化，那就是copy数据太慢了，5个线程copy 10G的数据，确实会很慢，这时就要调整这个参数了，
+			但是调整的太大，又会事半功倍，容易造成集群拥堵，所以Job tuning的同时，也是个权衡的过程，你要熟悉你的数据！
+			Reduce 任务的输入数据分布在集群内的多个Map 任务的输出中，Map 任务可能会在不同的时间内完成，
+			只要有其中的一个Map 任务完成，Reduce 任务就开始拷贝它的输出。这个阶段称之为拷贝阶段。
+			Reduce 任务拥有多个拷贝线程， 可以并行的获取Map 输出。可以通过设定mapred.reduce.parallel.copies 来改变线程数，默认是5
+			]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.job.shuffle.input.buffer.percent</name>
+			<value>0.7</value>
+			<description> 
+			<![CDATA[ 
+			当指定了JVM的堆内存最大值以后，上面这个配置项就是Reduce用来存放从
+			Map节点取过来的数据所用的内存占堆内存的比例，默认是0.7，既70%，
+			通常这个比例是够了，但是我们讨论的还是大数据的情况，
+			所以这个比例还是小了一些，0.8-0.9之间比较合适。（前提是你的reduce函数不会疯狂的吃掉内存）
+			]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.job.shuffle.merge.percent</name>
+			<value>0.8</value>
+			<description> 
+			<![CDATA[ 
+			从Map节点取数据过来，放到内存，当达到这个阈值之后，
+			后台启动线程（通常是Linux native process）把内存中的数据merge sort，
+			写到reduce节点的本地磁盘；mapred.job.shuffle.merge.percent默认值确实太小了,默认0.66
+			]]>
+			</description>
+		</property>
+		<property>
+			<name>tasktracker.http.threads</name>
+			<value>40</value>
+			<description> 
+			<![CDATA[ 
+			提高这个参数为TaskTracker的Http服务启用更多的工作线程。reduce通过Http服务获取map的中间输出 (默认40)
+			 当spill 文件归并完毕后，Map 将删除所有的临时spill 文件，并告知TaskTracker 任务已完成。Reducers 
+			 通过HTTP 来获取对应的数据。用来传输partitions 数据的工作线程数由tasktracker.http.threads 控制，
+		 这个设定是针对每一个TaskTracker 的，并不是单个Map，默认值为4，在运行大作业的大集群上可以增大以提升数据传输速率。
+		]]>
+			</description>
+		</property>
+		<property>
+			<name>mapred.inmem.merge.threshold</name>
+			<value>1000</value>
+			<description> 
+			<![CDATA[ 
+			默认值1000，完全取决于map输出数据的大小，如果map输出的数据很大，默认值1000反倒不好，
+			应该小一些，如果map输出的数据不大（light weight），可以设置2000或者以上，都没问题。
+			]]>
+			</description>
+		</property>
+		<property>
+			<name>root.log.dir</name>
+			
+			<value>/applog/log</value> 
+			 
+			<description>HDFS日志数据根目录,必须配置(Configuration required)</description>
+		</property>
+		<property>
+			<name>exclude.inputs</name>
+			<value>invalid|spider</value>
+			<description>配置要过滤的日志目录,比如其他(777)爬虫(spider)无效的(invalid)</description>
+		</property>
+		<property>
+			<name>only.include.spider.inputs</name>
+			<value>false</value>
+			<description>只算爬虫目录的数据</description>
+		</property>
+		<property>
+			<name>basedata.split.url.params.maxlength</name>
+			<value>300</value>
+			<description>基础数据拆分url参数截取长度</description>
+		</property>
+		<property>
+			<name>rank.max.nums</name>
+			<value>3000</value>
+			<description>排行榜最大数</description>
+		</property>
+		<property>
+			<name>dimension.code.length</name>
+			<value>15</value>
+			<description>维度组合长度</description>
+		</property>
+		<property>
+			<name>tmpjars</name>
+			
+			<value>/runtime/lib/ojdbc14-10.2.0.4.0.jar;/runtime/lib/session-1.0.0.jar;/runtime/lib/nutz-1.b.43.jar;/runtime/lib/ognl-2.6.11.jar</value>
+			
+			<description>计算参数和运行依赖jar包的配置</description>
+		</property>
+	</properties>
+</configuration>

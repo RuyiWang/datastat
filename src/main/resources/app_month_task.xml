@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<properties>
+		<tasks.parallel.permits>2</tasks.parallel.permits>
+		<tasks>
+			<task>
+				<args><![CDATA[{"logTypes":"B","granularity":"HOUR","configFile":"parameters_hour_client.xml","mapReduceClassName":""}]]></args>
+			</task>
+			<task>
+				<args><![CDATA[{"logTypes":"B","granularity":"HOUR","configFile":"parameters_hour_client.xml","mapReduceClassName":""}]]></args>
+			</task>
+		</tasks>
+	</properties>
+</configuration>
